@@ -1,11 +1,18 @@
+// globale variables used by game environment
+var rowHeight = 83;
+var columnWidth = 101;
+
 // Enemies our player must avoid
-var Enemy = function() {
+var Enemy = function(x,y) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
+    this.x = x;
+    this.y = y;
+    this.speed = [3,1017,250,4,6,3];
 }
 
 // Update the enemy's position, required method for game
@@ -14,6 +21,8 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
+    this.x += this.speed[Math.round(Math.random()*5)]*dt;
+    //this.x += 50 * this.speed * dt;
 }
 
 // Draw the enemy on the screen, required method for game
@@ -25,11 +34,76 @@ Enemy.prototype.render = function() {
 // This class requires an update(), render() and
 // a handleInput() method.
 
+var Player = function(x,y) {
+    this.sprite = 'images/char-boy.png';
+    this.x = x;
+    this.y = y;
+}
+
+Player.prototype.update = function(dt) {
+    // You should multiply any movement by the dt parameter
+    // which will ensure the game runs at the same speed for
+    // all computers.
+    this.x*dt;
+    this.y*dt;
+}
+
+// Draw the player on the screen, required method for game
+Player.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+}
+
+// Reset player position to starting point 
+Player.prototype.reset = function() {
+    this.x = 205;
+    this.y = 308;
+}
+
+Player.prototype.handleInput = function(keynum) {
+    switch(keynum)  {
+        case 'up':
+//           console.log(this.y);
+            if(this.y > 38) {
+                this.y -= 90;
+
+            }
+            // this means player hits water, reset to initial position
+            else {
+                player.reset();
+            }
+            break;
+        case 'down':
+            if(this.y < 375){
+                this.y+=90;
+            }
+            break;
+        case 'left':
+            if(this.x > 15){
+                this.x-=100;
+            }
+            break;
+        case 'right':
+            if(this.x < 400){
+                this.x+=100;
+            }
+            break;
+        default:
+            return;
+    }
+};
+
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
+var player = new Player(205,308);
+
+var enemy1 = new Enemy(205,55);
+var enemy2 = new Enemy(205,145);
+var enemy3 = new Enemy(205,225);
+
+allEnemies = [enemy1, enemy2, enemy3];
 
 
 // This listens for key presses and sends the keys to your
@@ -44,3 +118,4 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
