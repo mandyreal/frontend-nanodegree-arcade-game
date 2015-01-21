@@ -23,6 +23,10 @@ Enemy.prototype.update = function(dt) {
     // all computers.
     this.x += this.speed[Math.round(Math.random()*5)]*dt;
     //this.x += 50 * this.speed * dt;
+    if (this.x > 400) {
+       this.x -= 400;
+    }
+    
 }
 
 // Draw the enemy on the screen, required method for game
@@ -99,9 +103,9 @@ Player.prototype.handleInput = function(keynum) {
 
 var player = new Player(205,308);
 
-var enemy1 = new Enemy(205,55);
-var enemy2 = new Enemy(205,145);
-var enemy3 = new Enemy(205,225);
+var enemy1 = new Enemy(5,55);
+var enemy2 = new Enemy(55,145);
+var enemy3 = new Enemy(105,225);
 
 allEnemies = [enemy1, enemy2, enemy3];
 
