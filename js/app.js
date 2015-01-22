@@ -1,7 +1,21 @@
 // globale variables used by game environment
-// this variable controls how fast the bugs move, 
-// can be set from 200 onwards with 200 as normal speed
-var bugSpeed = 200;
+
+var bugSpeed = 100;  // this variable controls how fast the bugs move, lowest speed set to 100 as default
+var gameLevel = 1;   // starting level for the game, moves to next one everytime player reaches the water
+
+
+var GameEnv = function() {
+    this.sprite = 'images/Heart.png';
+}
+
+// Draw game environment elements on the screenm e.g. game level no.
+GameEnv.prototype.render = function() {
+    // Draw other game specific details like game level
+    ctx.font="25px Verdana";
+    ctx.fillStyle = "rgba(0, 0, 0, 1)";
+    ctx.textAlign = "left";
+    ctx.fillText("Level " + gameLevel,203,575,ctx.canvas.height); 
+}
 
 // Enemies our player must avoid
 var Enemy = function(x,y) {
@@ -25,19 +39,17 @@ Enemy.prototype.update = function(dt) {
     // Generate random speeds for each bug for every page refresh
     this.x += Math.round((Math.random()* 100) + bugSpeed) * dt;
 
-    // Collission detection logic. Reset player to starting position
-    // when any of the bugs collides with the player
+    // Check for collision between bugs and player 
+    // Reset player to starting position when any of the bugs collides with the player
     if ((this.x - player.x <  50 && this.y - player.y < 50) && 
         (this.x - player.x > -50 && this.y - player.y > -50)) {
         player.reset();
     }
 
-    // Check if bug location has reached the right end, 
-    // then reset bug's location to random starting point
+    // Check if bug location has reached the right end, then reset bug's location to random starting point
     if (this.x > 400) {
        this.x = -(Math.round(Math.random()*500));
     }
-    
 }
 
 // Draw the enemy on the screen, required method for game
@@ -50,7 +62,10 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 
 var Player = function(x,y) {
-    this.sprite = 'images/char-boy.png';
+    this.playerImages = ['images/char-boy.png','images/char-cat-girl.png',
+                         'images/char-horn-girl.png','images/char-pink-girl.png','images/char-princess-girl.png'];
+    // random selection of player for every new game
+    this.playerImg = this.playerImages[Math.floor(Math.random() * 5)];
     this.x = x;
     this.y = y;
 }
@@ -65,7 +80,7 @@ Player.prototype.update = function(dt) {
 
 // Draw the player on the screen, required method for game
 Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    ctx.drawImage(Resources.get(this.playerImg), this.x, this.y);
 }
 
 // Reset player position to starting point 
@@ -82,8 +97,12 @@ Player.prototype.handleInput = function(keynum) {
             if(this.y > 38) {
                 this.y -= 90;
             }
-            // this means player hits water, reset to initial position
             else {
+                // this means player hits water, reset to initial position
+                // increase bugSpeed everytime player is able to reach the water
+                // this way game difficulty is increased as well
+                bugSpeed  = bugSpeed + 55;
+                gameLevel = gameLevel + 1;
                 player.reset();
             }
             break;
@@ -105,22 +124,23 @@ Player.prototype.handleInput = function(keynum) {
         default:
             return;
     }
-};
+};  
 
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
+var gameenv = new GameEnv();
+
 var player = new Player(205,308);
 
-// assign randon starting x coordinate for each bug to add some randomness
+// assign random starting x coordinate for each bug
 var enemy1 = new Enemy(Math.round(Math.random()*105),55);
 var enemy2 = new Enemy(Math.round(Math.random()*105),145);
 var enemy3 = new Enemy(Math.round(Math.random()*105),225);
 
 allEnemies = [enemy1, enemy2, enemy3];
-
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
@@ -134,4 +154,5 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
 
